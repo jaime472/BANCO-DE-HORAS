@@ -1,0 +1,5 @@
+{
+  "name": "Sistema de Laudos Médicos",
+  "description": "Um sistema completo para gerenciamento de laudos médicos, controle de estoque de testes e visualização de relatórios. Inclui um dashboard moderno para monitoramento de dados.",
+  "requestFramePermissions": []
+}
