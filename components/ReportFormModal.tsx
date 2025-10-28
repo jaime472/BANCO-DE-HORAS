@@ -139,8 +139,8 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
     let finalReportData: ReportFormData;
 
     switch (formData.test_type) {
-      case TestType.DENGUE:
-        finalReportData = {
+      case TestType.DENGUE: {
+        const report: Omit<DengueReport, 'id' | 'created_at'> = {
           ...commonData,
           test_type: TestType.DENGUE,
           symptom_start_date: formData.symptom_start_date || '',
@@ -148,9 +148,11 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
           method: 'IMUNOCROMATOGRAFIA',
           result: formData.result as DengueResult,
         };
+        finalReportData = report;
         break;
-      case TestType.COVID:
-        finalReportData = {
+      }
+      case TestType.COVID: {
+        const report: Omit<CovidReport, 'id' | 'created_at'> = {
           ...commonData,
           test_type: TestType.COVID,
           city: formData.city || '',
@@ -159,9 +161,11 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
           sample_type: formData.sample_type as 'swab nasofaríngeo' | 'swab nasal',
           result: formData.result as CovidResult,
         };
+        finalReportData = report;
         break;
-      case TestType.HCG:
-        finalReportData = {
+      }
+      case TestType.HCG: {
+        const report: Omit<HcgReport, 'id' | 'created_at'> = {
           ...commonData,
           test_type: TestType.HCG,
           prontuario: formData.prontuario || '',
@@ -169,7 +173,9 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
           method: 'Imunocromatografia',
           result_value: formData.result_value || '',
         };
+        finalReportData = report;
         break;
+      }
       default:
         alert("Tipo de teste inválido selecionado.");
         return;
@@ -177,11 +183,11 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
 
     try {
       if (reportToEdit) {
-        const reportForUpdate: PatientReport = {
+        const reportForUpdate = {
           id: reportToEdit.id,
           created_at: reportToEdit.created_at,
           ...finalReportData,
-        };
+        } as PatientReport;
         await updateReport(reportToEdit.id, reportForUpdate);
       } else {
         await addReport(finalReportData);
