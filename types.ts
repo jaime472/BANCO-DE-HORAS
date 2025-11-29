@@ -1,3 +1,4 @@
+
 export enum TestType {
   DENGUE = 'Teste de Antígeno para Dengue - NS1',
   COVID = 'Teste Rápido de Antígeno - COVID-19',
@@ -11,6 +12,11 @@ export enum DengueResult {
 }
 
 export enum CovidResult {
+  POSITIVE = 'Positivo',
+  NEGATIVE = 'Negativo',
+}
+
+export enum HcgResult {
   POSITIVE = 'Positivo',
   NEGATIVE = 'Negativo',
 }

@@ -32,9 +32,17 @@ const Dashboard: React.FC<{ setPage: (page: Page) => void }> = ({ setPage }) => 
 
   const stockByType = useMemo(() => {
     return stock.reduce((acc, item) => {
-      acc[item.test_type] = (acc[item.test_type] || 0) + item.quantity;
+      // Normalização para agrupar nomes antigos/diferentes sob o mesmo TestType
+      let key = item.test_type;
+      const upperType = item.test_type.toUpperCase();
+      
+      if (key === TestType.DENGUE || upperType.includes('DENGUE')) key = TestType.DENGUE;
+      else if (key === TestType.COVID || upperType.includes('COVID')) key = TestType.COVID;
+      else if (key === TestType.HCG || upperType.includes('HCG') || upperType.includes('GRAVIDEZ') || upperType.includes('BETA')) key = TestType.HCG;
+
+      acc[key] = (acc[key] || 0) + item.quantity;
       return acc;
-    }, {} as Record<TestType, number>);
+    }, {} as Record<string, number>);
   }, [stock]);
 
   const stockBreakdown = (

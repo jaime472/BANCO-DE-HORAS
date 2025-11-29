@@ -43,12 +43,26 @@ function App() {
     fetchData();
   }, []);
 
+  // --- Helper para normalizar tipos de teste ---
+  const getTestCategory = (testName: string) => {
+    const upper = testName.toUpperCase();
+    if (upper.includes('DENGUE')) return 'DENGUE';
+    if (upper.includes('COVID')) return 'COVID';
+    if (upper.includes('HCG') || upper.includes('GRAVIDEZ') || upper.includes('BETA')) return 'HCG';
+    return upper;
+  };
+
   // --- CRUD Functions ---
 
   // Reports
   const addReport = async (reportData: ReportFormData) => {
     // 1. Deduct stock
-    const stockItem = stock.find(s => s.lote === reportData.lote && s.test_type === reportData.test_type);
+    // Procura o item no estoque usando o lote E verificando a categoria do teste (para compatibilidade com nomes legados)
+    const stockItem = stock.find(s => 
+      s.lote === reportData.lote && 
+      getTestCategory(s.test_type) === getTestCategory(reportData.test_type)
+    );
+
     if (!stockItem || stockItem.quantity <= 0) {
       throw new Error("Estoque insuficiente para o lote selecionado.");
     }

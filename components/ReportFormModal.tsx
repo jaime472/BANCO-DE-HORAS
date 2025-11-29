@@ -1,7 +1,7 @@
 
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { AppContext } from '../contexts/AppContext';
-import { PatientReport, TestType, DengueResult, CovidResult, HcgReport, DengueReport, CovidReport, ReportFormData, BaseReport } from '../types';
+import { PatientReport, TestType, DengueResult, CovidResult, HcgResult, HcgReport, DengueReport, CovidReport, ReportFormData, BaseReport } from '../types';
 
 interface ReportFormModalProps {
   isOpen: boolean;
@@ -47,7 +47,7 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
       city: '',
       manufacturer: '',
       prontuario: '',
-      result_value: '',
+      result_value: HcgResult.NEGATIVE,
     };
   }, [reportToEdit]);
 
@@ -106,15 +106,12 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
                 prontuario: '',
                 sample_type: 'urina',
                 method: 'Imunocromatografia',
-                result_value: '',
+                result_value: HcgResult.NEGATIVE,
             });
             break;
     }
   };
   
-  // FIX: Refactored handleSubmit to correctly construct a typed report object.
-  // This resolves a TypeScript error by creating a clean data object based on the
-  // selected test type, ensuring it matches one of the types in the PatientReport union.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -171,7 +168,7 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
           prontuario: formData.prontuario || '',
           sample_type: 'urina',
           method: 'Imunocromatografia',
-          result_value: formData.result_value || '',
+          result_value: formData.result_value || HcgResult.NEGATIVE,
         };
         finalReportData = report;
         break;
@@ -197,6 +194,25 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
         console.error("Failed to save report:", error);
         alert(`Falha ao salvar o laudo: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
+  };
+
+  const getFilteredStock = () => {
+    return stock.filter(s => {
+      if (s.quantity <= 0) return false;
+      
+      // Strict match
+      if (s.test_type === formData.test_type) return true;
+
+      // Loose match for legacy data compatibility
+      const targetType = formData.test_type;
+      const stockTypeUpper = s.test_type.toUpperCase();
+
+      if (targetType === TestType.DENGUE && stockTypeUpper.includes('DENGUE')) return true;
+      if (targetType === TestType.COVID && stockTypeUpper.includes('COVID')) return true;
+      if (targetType === TestType.HCG && (stockTypeUpper.includes('HCG') || stockTypeUpper.includes('GRAVIDEZ') || stockTypeUpper.includes('BETA'))) return true;
+
+      return false;
+    });
   };
 
   if (!isOpen) return null;
@@ -256,7 +272,9 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300">Valor de Referência</label>
-              <input type="text" name="result_value" value={hcgData.result_value || ''} placeholder="ex: <25mUI/mL" className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-secondary focus:border-brand-secondary"/>
+              <select name="result_value" value={hcgData.result_value} onChange={handleChange} className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-brand-secondary focus:border-brand-secondary">
+                 {Object.values(HcgResult).map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
             </div>
           </>
         );
@@ -331,9 +349,9 @@ const ReportFormModal: React.FC<ReportFormModalProps> = ({ isOpen, onClose, repo
                       required={!reportToEdit}
                    >
                       <option value="|">Selecione um lote do estoque</option>
-                      {stock.filter(s => s.test_type === formData.test_type && s.quantity > 0).map(s => (
+                      {getFilteredStock().map(s => (
                           <option key={s.id} value={`${s.lote}|${s.validade}`}>
-                              Lote: {s.lote} / Val: {new Date(s.validade).toLocaleDateString('pt-BR', {timeZone: 'UTC'})} ({s.quantity} und.)
+                              Lote: {s.lote} / Val: {new Date(s.validade).toLocaleDateString('pt-BR', {timeZone: 'UTC'})} ({s.quantity} und.) - {s.test_type}
                           </option>
                       ))}
                    </select>

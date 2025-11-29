@@ -133,7 +133,7 @@ const HcgTemplate: React.FC<{ report: HcgReport }> = ({ report }) => (
       <div className="flex border-b-2 border-black"><div className="w-1/2 p-2 border-r-2 border-black"><strong>Lote:</strong> {report.lote}</div><div className="w-1/2 p-2"><strong>Validade:</strong> {new Date(report.validade).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</div></div>
       <div className="p-2"><strong>Método:</strong> {report.method}</div>
     </section>
-    <section className="border border-black mt-6 p-2" style={{ backgroundColor: '#f0f0f0' }}><div className="text-right font-semibold text-lg">Resultado</div><div className="text-center text-3xl font-bold my-4 uppercase">{report.result_value}</div></section>
+    <section className="border border-black mt-6 p-2" style={{ backgroundColor: '#f0f0f0' }}><div className="text-right font-semibold text-lg">Valor de Referência</div><div className="text-center text-3xl font-bold my-4 uppercase">{report.result_value}</div></section>
     <section className="mt-6 space-y-3" style={{ fontSize: '8pt', lineHeight: '1.2' }}><p><span className="font-bold">Nota:</span> Este é um teste de triagem qualitativo. A interpretação do resultado deve ser realizada por um profissional de saúde, correlacionando com os dados clínicos do paciente.</p><p>Resultados <strong>POSITIVOS</strong> são sugestivos de gravidez, mas devem ser confirmados por avaliação médica. Resultados <strong>NEGATIVOS</strong> em fases muito iniciais da gestação podem não ser conclusivos. Recomenda-se repetir o teste após alguns dias caso a suspeita persista ou a menstruação atrase.</p></section>
     <div className="flex-grow"></div>
     <footer className="mt-auto pt-12 text-sm">
